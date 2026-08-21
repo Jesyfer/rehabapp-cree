@@ -1,0 +1,901 @@
+<title>RehabApp CREE</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Source+Sans+3:ital,opsz,wght@0,9..46,300;0,9..46,400;0,9..46,600;1,9..46,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════
+   TOKENS — light-first, dark via media
+═══════════════════════════════════════ */
+:root {
+  --bg:         #F0F4F1;
+  --bg-card:    #FFFFFF;
+  --bg-raised:  #E6EEE9;
+  --text:       #142019;
+  --text-2:     #3B5D44;
+  --text-3:     #6B8E74;
+  --border:     #C3D8CB;
+  --shadow:     0 1px 3px rgba(18,50,25,.07), 0 4px 16px rgba(18,50,25,.06);
+  --shadow-lg:  0 4px 12px rgba(18,50,25,.08), 0 16px 40px rgba(18,50,25,.10);
+  --green:      #25A85A;
+  --green-bg:   rgba(37,168,90,.10);
+  --blue:       #3589C8;
+  --blue-bg:    rgba(53,137,200,.10);
+  --amber:      #C08828;
+  --amber-bg:   rgba(192,136,40,.10);
+  --radius:     14px;
+  --radius-sm:  8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:         #0C1F14;
+    --bg-card:    #142B1C;
+    --bg-raised:  #1C3526;
+    --text:       #D9E9DF;
+    --text-2:     #89B895;
+    --text-3:     #5B8267;
+    --border:     #2B4D38;
+    --shadow:     0 1px 4px rgba(0,0,0,.32), 0 4px 16px rgba(0,0,0,.28);
+    --shadow-lg:  0 4px 12px rgba(0,0,0,.32), 0 16px 40px rgba(0,0,0,.38);
+    --green:      #3DC97A;
+    --green-bg:   rgba(61,201,122,.13);
+    --blue:       #5FB5E0;
+    --blue-bg:    rgba(95,181,224,.13);
+    --amber:      #D9A840;
+    --amber-bg:   rgba(217,168,64,.13);
+  }
+}
+:root[data-theme="dark"] {
+  --bg:         #0C1F14;
+  --bg-card:    #142B1C;
+  --bg-raised:  #1C3526;
+  --text:       #D9E9DF;
+  --text-2:     #89B895;
+  --text-3:     #5B8267;
+  --border:     #2B4D38;
+  --shadow:     0 1px 4px rgba(0,0,0,.32), 0 4px 16px rgba(0,0,0,.28);
+  --shadow-lg:  0 4px 12px rgba(0,0,0,.32), 0 16px 40px rgba(0,0,0,.38);
+  --green:      #3DC97A;
+  --green-bg:   rgba(61,201,122,.13);
+  --blue:       #5FB5E0;
+  --blue-bg:    rgba(95,181,224,.13);
+  --amber:      #D9A840;
+  --amber-bg:   rgba(217,168,64,.13);
+}
+
+/* ═══════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 17px;
+  line-height: 1.65;
+  min-height: 100vh;
+  transition: background .25s, color .25s;
+}
+a { color: var(--green); text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-radius: 4px; }
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .88em;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+/* ═══════════════════════════════════════
+   NAV
+═══════════════════════════════════════ */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 0 max(24px, 5vw);
+  height: 58px;
+}
+.nav-logo {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800; font-size: 17px;
+  color: var(--text); letter-spacing: -.3px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.nav-logo em { font-style: normal; color: var(--green); }
+.nav-logo span { font-weight: 400; color: var(--text-3); font-size: 15px; }
+
+.nav-switcher {
+  display: flex; gap: 6px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s;
+}
+.nav-switcher.visible { opacity: 1; pointer-events: auto; }
+.npill {
+  font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 12px;
+  padding: 5px 13px; border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: transparent; color: var(--text-3);
+  cursor: pointer; white-space: nowrap;
+  transition: all .18s;
+}
+.npill:hover { color: var(--text); border-color: var(--text-3); }
+.npill.ap { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+.npill.ai { background: var(--blue-bg);  border-color: var(--blue);  color: var(--blue); }
+.npill.at { background: var(--amber-bg); border-color: var(--amber); color: var(--amber); }
+
+/* ═══════════════════════════════════════
+   HERO
+═══════════════════════════════════════ */
+.hero {
+  padding: 72px max(24px, 5vw) 56px;
+  max-width: 880px; margin: 0 auto;
+  text-align: center;
+}
+.eyebrow {
+  font-size: 12px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 18px;
+}
+.hero-title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: clamp(36px, 6vw, 62px);
+  line-height: 1.07; letter-spacing: -1.5px;
+  color: var(--text); text-wrap: balance;
+  margin-bottom: 20px;
+}
+.hero-title em { font-style: normal; color: var(--green); }
+.hero-sub {
+  font-size: 19px; color: var(--text-2);
+  max-width: 540px; margin: 0 auto 50px;
+  text-wrap: balance;
+}
+.profile-prompt {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500; font-size: 14px;
+  color: var(--text-3); margin-bottom: 18px;
+}
+
+/* ═══════════════════════════════════════
+   PROFILE CARDS
+═══════════════════════════════════════ */
+.profile-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px; max-width: 740px; margin: 0 auto;
+}
+@media (max-width: 560px) {
+  .profile-cards { grid-template-columns: 1fr; max-width: 340px; }
+}
+.pcard {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 18px 20px;
+  cursor: pointer; text-align: left;
+  transition: transform .22s cubic-bezier(.4,0,.2,1),
+              box-shadow .22s, border-color .18s, background .18s;
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 9px;
+  user-select: none; position: relative; overflow: hidden;
+}
+.pcard::after {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  opacity: 0; transition: opacity .2s;
+}
+.pcard.pp::after { background: var(--green); }
+.pcard.pi::after { background: var(--blue); }
+.pcard.pt::after { background: var(--amber); }
+.pcard:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.pcard.pp:hover, .pcard.pp.sel { border-color: var(--green); }
+.pcard.pi:hover, .pcard.pi.sel { border-color: var(--blue); }
+.pcard.pt:hover, .pcard.pt.sel { border-color: var(--amber); }
+.pcard.pp.sel { background: var(--green-bg); }
+.pcard.pi.sel { background: var(--blue-bg); }
+.pcard.pt.sel { background: var(--amber-bg); }
+.pcard.sel::after { opacity: 1; }
+
+.pc-icon {
+  width: 42px; height: 42px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.pp .pc-icon { background: var(--green-bg); color: var(--green); }
+.pi .pc-icon { background: var(--blue-bg);  color: var(--blue); }
+.pt .pc-icon { background: var(--amber-bg); color: var(--amber); }
+
+.pc-chk {
+  position: absolute; top: 12px; right: 12px;
+  width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transform: scale(.5);
+  transition: all .2s;
+}
+.pp.sel .pc-chk { opacity: 1; transform: scale(1); background: var(--green); }
+.pi.sel .pc-chk { opacity: 1; transform: scale(1); background: var(--blue); }
+.pt.sel .pc-chk { opacity: 1; transform: scale(1); background: var(--amber); }
+
+.pc-label {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700; font-size: 16px; color: var(--text);
+}
+.pc-desc { font-size: 13px; color: var(--text-2); line-height: 1.45; }
+
+/* ═══════════════════════════════════════
+   CONTENT
+═══════════════════════════════════════ */
+.content {
+  max-width: 860px; margin: 0 auto;
+  padding: 0 max(24px, 5vw) 80px;
+}
+.panel {
+  display: none;
+  animation: fsIn .42s cubic-bezier(.4,0,.2,1) forwards;
+}
+.panel.active { display: block; }
+@keyframes fsIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  @keyframes fsIn { from { opacity: 0; } to { opacity: 1; } }
+}
+
+.divider {
+  width: 36px; height: 3px; border-radius: 2px;
+  margin: 52px 0 38px; opacity: .4;
+}
+.dp { background: var(--green); }
+.di { background: var(--blue); }
+.dt { background: var(--amber); }
+
+.sec-eyebrow {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 7px;
+}
+.sec-h {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: clamp(21px, 3.2vw, 28px);
+  letter-spacing: -.4px; color: var(--text);
+  text-wrap: balance; margin-bottom: 12px;
+}
+.sec-p {
+  font-size: 17px; color: var(--text-2);
+  max-width: 680px; margin-bottom: 28px; line-height: 1.65;
+}
+
+/* Card grid */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px; margin-bottom: 36px;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px; box-shadow: var(--shadow);
+}
+.card-hed {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600; font-size: 15px;
+  color: var(--text); margin-bottom: 6px;
+}
+.card-txt { font-size: 14px; color: var(--text-2); line-height: 1.5; }
+
+/* Icon badge on card */
+.card-ic {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 12px;
+}
+.ic-g { background: var(--green-bg); color: var(--green); }
+.ic-b { background: var(--blue-bg);  color: var(--blue); }
+.ic-a { background: var(--amber-bg); color: var(--amber); }
+
+/* Steps */
+.steps { margin-bottom: 36px; }
+.step {
+  display: flex; gap: 18px; align-items: flex-start;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--border);
+}
+.step:last-child { border-bottom: none; }
+.step-n {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px;
+  flex-shrink: 0; margin-top: 1px;
+}
+.sp .step-n { background: var(--green-bg); color: var(--green); }
+.si .step-n { background: var(--blue-bg);  color: var(--blue); }
+.st .step-n { background: var(--amber-bg); color: var(--amber); }
+.step-hed {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600; font-size: 16px; color: var(--text); margin-bottom: 4px;
+}
+.step-txt { font-size: 15px; color: var(--text-2); }
+
+/* FAQ */
+.faq { margin-bottom: 36px; }
+.faq-item { border-bottom: 1px solid var(--border); }
+summary.fq {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 12px;
+  padding: 16px 0; cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600; font-size: 15px; color: var(--text);
+  list-style: none; user-select: none;
+}
+summary.fq::-webkit-details-marker { display: none; }
+summary.fq::after {
+  content: '+'; font-size: 20px; font-weight: 300;
+  color: var(--text-3); flex-shrink: 0; transition: transform .18s;
+}
+details[open] summary.fq::after { content: '−'; }
+.fa {
+  font-size: 15px; color: var(--text-2);
+  padding-bottom: 16px; line-height: 1.65; max-width: 640px;
+}
+
+/* Callout */
+.callout {
+  border-left: 3px solid;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--bg-raised);
+  padding: 14px 18px; margin-bottom: 28px;
+  font-size: 15px; color: var(--text-2); line-height: 1.6;
+}
+.callout strong { color: var(--text); }
+.cp { border-color: var(--green); }
+.ci { border-color: var(--blue); }
+.ct { border-color: var(--amber); }
+
+/* Tags */
+.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+.tag {
+  font-size: 12px; font-weight: 600;
+  padding: 4px 11px; border-radius: 100px;
+  border: 1.5px solid; letter-spacing: .02em;
+  font-family: 'Source Sans 3', sans-serif;
+}
+.tg { color: var(--green); border-color: var(--green); background: var(--green-bg); }
+.tb { color: var(--blue);  border-color: var(--blue);  background: var(--blue-bg); }
+.ta { color: var(--amber); border-color: var(--amber); background: var(--amber-bg); }
+.tn { color: var(--text-3); border-color: var(--border); }
+
+/* Table */
+.tbl-wrap { overflow-x: auto; margin-bottom: 32px; }
+table {
+  width: 100%; border-collapse: collapse;
+  font-size: 14px; min-width: 540px;
+}
+th {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600; font-size: 11px;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text-3); text-align: left;
+  padding: 9px 14px;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-2); vertical-align: top; line-height: 1.45;
+}
+tr:last-child td { border-bottom: none; }
+td:first-child {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px; color: var(--text); white-space: nowrap;
+}
+tbody tr:hover td { background: var(--bg-raised); }
+
+/* Code block */
+.codeblock {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 18px 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; color: var(--text-2);
+  overflow-x: auto; line-height: 1.65;
+  margin-bottom: 24px; white-space: pre;
+}
+
+/* Alarm cards */
+.alarms {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px; margin-bottom: 32px;
+}
+.alm {
+  border-radius: var(--radius-sm);
+  padding: 16px; border: 1px solid;
+}
+.alm-y { border-color: var(--amber); background: var(--amber-bg); }
+.alm-r { border-color: #D85454; background: rgba(216,84,84,.10); }
+.alm-lbl {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700; font-size: 12px;
+  letter-spacing: .05em; text-transform: uppercase;
+  margin-bottom: 7px;
+}
+.alm-y .alm-lbl { color: var(--amber); }
+.alm-r .alm-lbl { color: #D85454; }
+.alm-txt { font-size: 14px; color: var(--text-2); line-height: 1.5; }
+
+/* Two-col */
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+@media (max-width: 580px) { .two { grid-template-columns: 1fr; } }
+
+/* ═══════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════ */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 28px max(24px, 5vw);
+  display: flex; align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.f-logo {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700; font-size: 15px; color: var(--green);
+}
+.f-logo span { font-weight: 400; color: var(--text-3); }
+.f-meta { font-size: 13px; color: var(--text-3); text-align: right; }
+</style>
+
+<!-- ── NAV ───────────────────────────────────────── -->
+<nav class="nav">
+  <div class="nav-logo">Rehab<em>App</em> <span>· CREE</span></div>
+  <div class="nav-switcher" id="ns">
+    <button class="npill pp" onclick="sel('p')">Paciente</button>
+    <button class="npill pi" onclick="sel('i')">Investigadora</button>
+    <button class="npill pt" onclick="sel('t')">Terapeuta</button>
+  </div>
+</nav>
+
+<!-- ── HERO ──────────────────────────────────────── -->
+<section class="hero">
+  <p class="eyebrow">CREE DIF Toluca · UAEMéx · Programa Osteoporosis</p>
+  <h1 class="hero-title">Rehabilitación que <em>acompaña</em> al paciente en casa</h1>
+  <p class="hero-sub">App Android para el programa de rehabilitación de osteoporosis. Tai Chi guiado, ejercicio funcional con cámara y seguimiento clínico — sin necesitar internet.</p>
+
+  <p class="profile-prompt">Elige tu perfil para ver lo que te interesa</p>
+
+  <div class="profile-cards">
+
+    <div class="pcard pp" onclick="sel('p')" role="button" tabindex="0" aria-label="Soy paciente">
+      <div class="pc-chk">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+          <path d="M1.5 5.5l3 3 5-5" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="pc-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+          <circle cx="11" cy="5.5" r="3"/>
+          <path d="M5 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+          <path d="M8.5 12.5l-1.5 5M13.5 12.5l1.5 5"/>
+        </svg>
+      </div>
+      <div class="pc-label">Soy paciente</div>
+      <div class="pc-desc">Qué hace la app, cómo usarla y qué esperar del programa.</div>
+    </div>
+
+    <div class="pcard pi" onclick="sel('i')" role="button" tabindex="0" aria-label="Soy investigador o investigadora">
+      <div class="pc-chk">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+          <path d="M1.5 5.5l3 3 5-5" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="pc-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+          <polyline points="2 17 8 10 12.5 14 20 6"/>
+          <line x1="14" y1="6" x2="20" y2="6"/>
+          <line x1="20" y1="6" x2="20" y2="12"/>
+        </svg>
+      </div>
+      <div class="pc-label">Soy investigador/a</div>
+      <div class="pc-desc">Arquitectura, detectores cinemáticos y estructura de datos clínicos.</div>
+    </div>
+
+    <div class="pcard pt" onclick="sel('t')" role="button" tabindex="0" aria-label="Soy terapeuta">
+      <div class="pc-chk">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+          <path d="M1.5 5.5l3 3 5-5" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="pc-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+          <rect x="3" y="4" width="16" height="16" rx="2"/>
+          <line x1="7" y1="2" x2="7" y2="6"/>
+          <line x1="15" y1="2" x2="15" y2="6"/>
+          <line x1="3" y1="10" x2="19" y2="10"/>
+          <line x1="8" y1="14" x2="14" y2="14"/>
+          <line x1="11" y1="11" x2="11" y2="17"/>
+        </svg>
+      </div>
+      <div class="pc-label">Soy terapeuta</div>
+      <div class="pc-desc">Gestión de citas, seguimiento clínico y exportación de datos.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── CONTENT PANELS ────────────────────────────── -->
+<div class="content">
+
+  <!-- ╔══════════════════╗
+       ║   PACIENTE       ║
+       ╚══════════════════╝ -->
+  <div id="panel-p" class="panel">
+
+    <div class="divider dp"></div>
+
+    <p class="sec-eyebrow">Tu programa</p>
+    <h2 class="sec-h">Dos actividades, un seguimiento continuo</h2>
+    <p class="sec-p">RehabApp combina sesiones de Tai Chi y ejercicios monitoreados con cámara en un programa de 12 semanas diseñado por las terapeutas del CREE DIF Toluca. Todo funciona en tu teléfono, sin internet.</p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-ic ic-g">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <circle cx="10" cy="4" r="2.5"/>
+            <path d="M5 10c1-2 9-2 10 0M7.5 10l-1 7M12.5 10l1 7"/>
+            <path d="M6 14h8"/>
+          </svg>
+        </div>
+        <div class="card-hed">Tai Chi</div>
+        <div class="card-txt">2 veces por semana. La app te guía con animaciones del movimiento y cuenta tus repeticiones en pantalla.</div>
+      </div>
+      <div class="card">
+        <div class="card-ic ic-b">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <rect x="3" y="2" width="14" height="18" rx="2"/>
+            <circle cx="10" cy="10" r="3"/>
+            <line x1="7" y1="5" x2="13" y2="5"/>
+          </svg>
+        </div>
+        <div class="card-hed">Ejercicio funcional</div>
+        <div class="card-txt">3 veces por semana. La cámara del teléfono detecta tu movimiento y avisa si hay algo que corregir.</div>
+      </div>
+      <div class="card">
+        <div class="card-ic ic-a">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <rect x="2" y="3" width="16" height="15" rx="2"/>
+            <line x1="6" y1="1" x2="6" y2="5"/>
+            <line x1="14" y1="1" x2="14" y2="5"/>
+            <line x1="2" y1="9" x2="18" y2="9"/>
+            <line x1="7" y1="13" x2="13" y2="13"/>
+            <line x1="10" y1="11" x2="10" y2="15"/>
+          </svg>
+        </div>
+        <div class="card-hed">Citas en la app</div>
+        <div class="card-txt">Tus visitas al CREE aparecen en la pestaña Citas. Recibes un aviso el día anterior y una hora antes.</div>
+      </div>
+      <div class="card">
+        <div class="card-ic ic-g">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M10 2a6 6 0 0 1 6 6c0 4-6 10-6 10S4 12 4 8a6 6 0 0 1 6-6z"/>
+            <circle cx="10" cy="8" r="2"/>
+          </svg>
+        </div>
+        <div class="card-hed">Recordatorios</div>
+        <div class="card-txt">Elige tus días y tu hora preferida. La app te recuerda sin necesidad de internet ni configuración extra.</div>
+      </div>
+    </div>
+
+    <div class="divider dp"></div>
+
+    <p class="sec-eyebrow">Primeros pasos</p>
+    <h2 class="sec-h">Cómo empieza tu programa</h2>
+
+    <div class="steps">
+      <div class="step sp">
+        <div class="step-n">1</div>
+        <div>
+          <div class="step-hed">Primera visita en el CREE</div>
+          <div class="step-txt">La terapeuta instala la app en tu teléfono y registra tu nombre, horario preferido y los días que quieres hacer ejercicio. Recibes un código de paciente único para identificar tus datos.</div>
+        </div>
+      </div>
+      <div class="step sp">
+        <div class="step-n">2</div>
+        <div>
+          <div class="step-hed">Haz tu sesión en casa</div>
+          <div class="step-txt">Abre la app cuando llegue tu día. Elige Tai Chi o sesión de ejercicio, coloca el teléfono a la distancia indicada y sigue las instrucciones en pantalla. La app cuenta tus repeticiones sola.</div>
+        </div>
+      </div>
+      <div class="step sp">
+        <div class="step-n">3</div>
+        <div>
+          <div class="step-hed">Revisa tu avance</div>
+          <div class="step-txt">En la pestaña "Mi progreso" puedes ver cuántas sesiones llevas, en qué semana del programa estás y el historial completo de tus ejercicios.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider dp"></div>
+
+    <p class="sec-eyebrow">Preguntas frecuentes</p>
+    <h2 class="sec-h">Lo que más nos preguntan</h2>
+
+    <div class="faq">
+      <details class="faq-item">
+        <summary class="fq">¿La app necesita internet?</summary>
+        <div class="fa">No. Todo funciona sin conexión: las sesiones de ejercicio, el conteo de movimientos, el historial de progreso y los recordatorios. Solo se necesita internet si la terapeuta quiere compartir tus datos con el equipo de investigación.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="fq">¿La cámara me graba?</summary>
+        <div class="fa">No. La cámara detecta los puntos de tu cuerpo en tiempo real para contar movimientos y verificar tu postura, pero <strong>no guarda ningún video ni foto</strong>. Solo se registran números que describen tu posición.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="fq">¿Qué pasa si me salto un día?</summary>
+        <div class="fa">Nada grave. La app registra las sesiones que sí realizas y el progreso se acumula. Puedes retomar cuando puedas — tus datos se guardan en el teléfono y no se borran.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="fq">¿Quién puede ver mis datos?</summary>
+        <div class="fa">Solo tú y el equipo del CREE DIF Toluca. Los datos se guardan únicamente en tu teléfono. Durante tus visitas de seguimiento, la terapeuta puede exportarlos directamente desde tu dispositivo.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="fq">¿La app me avisa si hago algo mal?</summary>
+        <div class="fa">Sí. Durante los ejercicios con cámara, si la app detecta una postura que conviene corregir — por ejemplo, doblar las rodillas cuando no debes — aparece un aviso en pantalla con una indicación sencilla.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="fq">¿Necesito experiencia con tecnología?</summary>
+        <div class="fa">No. La app está diseñada para usarse sola, con letras grandes y pasos muy claros. En tu primera visita la terapeuta te explica cómo funciona y te ayuda a configurarla a tu gusto.</div>
+      </details>
+    </div>
+
+    <div class="callout cp">
+      <strong>¿Tienes otra pregunta?</strong> Dentro de la app hay un botón de ayuda que abre un chat de WhatsApp directamente con tu terapeuta en el CREE.
+    </div>
+
+  </div><!-- /panel-p -->
+
+
+  <!-- ╔══════════════════╗
+       ║  INVESTIGADORA   ║
+       ╚══════════════════╝ -->
+  <div id="panel-i" class="panel">
+
+    <div class="divider di"></div>
+
+    <p class="sec-eyebrow">Estado del proyecto</p>
+    <h2 class="sec-h">RehabApp CREE · v1.0</h2>
+    <div class="tags">
+      <span class="tag tg">En validación clínica</span>
+      <span class="tag tb">Flutter · Android</span>
+      <span class="tag tn">100 % offline</span>
+      <span class="tag tn">CREE DIF Toluca · UAEMéx</span>
+    </div>
+    <p class="sec-p">App Android para el monitoreo cinemático de ejercicio funcional y Tai Chi en pacientes con osteoporosis. Procesa cada frame con ML Kit Pose Detection en el dispositivo, sin transmitir datos a servidores externos. Los registros clínicos se exportan como CSV para análisis offline.</p>
+
+    <div class="divider di"></div>
+
+    <p class="sec-eyebrow">Arquitectura</p>
+    <h2 class="sec-h">Stack tecnológico</h2>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Capa</th><th>Paquete / versión</th><th>Rol</th></tr></thead>
+        <tbody>
+          <tr><td>Framework</td><td>Flutter 3 · Dart 3.11</td><td>UI + lógica de negocio. Target Android API 21+</td></tr>
+          <tr><td>Detección de pose</td><td>google_mlkit_pose_detection 0.14</td><td>33 landmarks 3D por frame; procesado on-device en hilo ML Kit</td></tr>
+          <tr><td>Cámara externa</td><td>flutter_uvc_camera (OTG)</td><td>Soporte webcam USB para sesiones de monitoreo clínico en consulta</td></tr>
+          <tr><td>Persistencia</td><td>sqflite + shared_preferences</td><td>SQLite para citas médicas; prefs para datos de paciente y configuración</td></tr>
+          <tr><td>Exportación</td><td>csv + share_plus + archive</td><td>CSV clínico por serie + ZIP para compartir al equipo investigador</td></tr>
+          <tr><td>Notificaciones</td><td>flutter_local_notifications 18 + timezone 0.9</td><td>Alarmas exactas. Recordatorios semanales recurrentes + alertas de cita</td></tr>
+          <tr><td>Comunicación</td><td>url_launcher 6.3</td><td>Deep links a WhatsApp para consulta con terapeuta</td></tr>
+          <tr><td>Criptografía</td><td>crypto</td><td>SHA-256 para hash de contraseña clínica del doctor</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="divider di"></div>
+
+    <p class="sec-eyebrow">Detectores cinemáticos</p>
+    <h2 class="sec-h">7 ejercicios monitoreados en tiempo real</h2>
+    <p class="sec-p">Cada detector implementa <code>EjercicioDetector</code>, procesa un <code>Pose</code> por frame (~30 Hz) y devuelve <code>ResultadoFrame</code> con reps, fase y alarma. Todas las transiciones requieren confirmación de 4 frames consecutivos para filtrar ruido del tracker.</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Ejercicio</th><th>Señal</th><th>Ciclo de rep</th><th>Alarmas</th></tr></thead>
+        <tbody>
+          <tr><td>sit_to_stand</td><td>Ángulo cadera (hombro–cadera–rodilla)</td><td>Sentado &lt;110° → De pie &gt;160°</td><td>—</td></tr>
+          <tr><td>rdl</td><td>Ángulo cadera sagital</td><td>Extendido &gt;165° → Bisagra &lt;130°</td><td>Rodilla &lt;150° (amarilla)</td></tr>
+          <tr><td>step_up</td><td>avgKneeY bilateral vs. baseline EMA</td><td>Elevación &gt;0.045 → ESCALON; &lt;0.025 → SUELO +rep</td><td>Tronco, rodilla, equilibrio (amarilla)</td></tr>
+          <tr><td>elevacion_talones</td><td>anguloConHorizontal(punta→tobillo)</td><td>+12° sobre base → isométrico ≥500 ms → −5° sobre base +rep</td><td>Rodilla &lt;160° (amarilla)</td></tr>
+          <tr><td>heel_drop</td><td>Igual + velocidad angular de descenso</td><td>+10° sobre base → vuelta −5° +rep; alarma si pico &gt;70°/s</td><td>Descenso brusco (amarilla)</td></tr>
+          <tr><td>remo</td><td>Ángulo de codo / separación escapular</td><td>Retracción con banda elástica</td><td>—</td></tr>
+          <tr><td>lateralizaciones</td><td>Desplazamiento horizontal de centroide</td><td>Pasos laterales alternos</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout ci">
+      <strong>Anti-jitter:</strong> todas las transiciones exigen 4 frames consecutivos (<code>_framesConfirmacion = 4</code>). Los detectores angulares usan EMA (α = 0.07–0.08) para calibración adaptiva de baseline. Un timeout de 6 s recalibra la base si el estado se atasca por cambio de postura o encuadre.
+    </div>
+
+    <div class="divider di"></div>
+
+    <p class="sec-eyebrow">Estructura de datos</p>
+    <h2 class="sec-h">CSV clínico por serie · ~30 Hz</h2>
+    <p class="sec-p">Cada ejercicio genera un archivo CSV con una fila por frame. El nombre codifica la fecha, el ejercicio y el número de serie.</p>
+
+    <div class="codeblock">Nombre:
+  YYYY-MM-DD_HHmmss_{ejercicio}_serie{N}_monitoreo.csv
+
+Columnas comunes (todos los detectores):
+  timestamp, repeticiones, fase, lado_activo,
+  alarma_activa, severidad_alarma
+
+Columnas específicas — ejemplo elevacion_talones:
+  angulo_talon_grados, angulo_rodilla_grados,
+  rodilla_x, rodilla_y, rodilla_vis,
+  tobillo_x,  tobillo_y,  tobillo_vis,
+  punta_x,    punta_y,    punta_vis</div>
+
+    <p class="sec-p">Un CSV de debug muestreado a 5 Hz se genera en paralelo para inspección rápida de sesiones. Contiene las mismas señales más <code>ratio_vista</code> (visibilidad promedio de los landmarks del lado activo).</p>
+
+    <div class="divider di"></div>
+
+    <p class="sec-eyebrow">Protocolo clínico</p>
+    <h2 class="sec-h">12 semanas · 3 fases · 2 modalidades</h2>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-hed">Fase 1 · Sem. 1–4</div>
+        <div class="card-txt">Iniciación y movilidad básica. Ejercicios de menor demanda biomecánica. Tai Chi 2×/semana + ejercicio funcional 3×/semana.</div>
+      </div>
+      <div class="card">
+        <div class="card-hed">Fase 2 · Sem. 5–8</div>
+        <div class="card-txt">Consolidación e intensidad media. Incorporación de ejercicios de mayor carga articular y balance.</div>
+      </div>
+      <div class="card">
+        <div class="card-hed">Fase 3 · Sem. 9–12</div>
+        <div class="card-txt">Mantenimiento y autonomía. Protocolo completo, 3 series por ejercicio, evaluación de adherencia.</div>
+      </div>
+    </div>
+
+    <div class="callout ci">
+      <strong>Meta de adherencia:</strong> 24 sesiones de Tai Chi + 36 sesiones de ejercicio funcional en 12 semanas. La app registra ambas métricas por separado y calcula el porcentaje de cumplimiento acumulado por modalidad.
+    </div>
+
+  </div><!-- /panel-i -->
+
+
+  <!-- ╔══════════════════╗
+       ║   TERAPEUTA      ║
+       ╚══════════════════╝ -->
+  <div id="panel-t" class="panel">
+
+    <div class="divider dt"></div>
+
+    <p class="sec-eyebrow">Primera visita centinela</p>
+    <h2 class="sec-h">Flujo de configuración inicial</h2>
+
+    <div class="steps">
+      <div class="step st">
+        <div class="step-n">1</div>
+        <div>
+          <div class="step-hed">Instalar y registrar al paciente</div>
+          <div class="step-txt">El formulario de registro captura nombre, edad, sexo, número de contacto, días preferidos de sesión y horario. Se genera un código de paciente único. Los días y horas quedan configurados como recordatorios automáticos.</div>
+        </div>
+      </div>
+      <div class="step st">
+        <div class="step-n">2</div>
+        <div>
+          <div class="step-hed">Agendar las primeras citas</div>
+          <div class="step-txt">En la pestaña "Citas" se programan las visitas de seguimiento (rehabilitación, consulta o evaluación), con notas opcionales. El paciente recibe una notificación 24 h y 1 h antes de cada cita.</div>
+        </div>
+      </div>
+      <div class="step st">
+        <div class="step-n">3</div>
+        <div>
+          <div class="step-hed">Asignar la fase del programa</div>
+          <div class="step-txt">En Ajustes → "Programa de rehabilitación", cambiar la fase del paciente usando la contraseña clínica. La fase determina qué ejercicios y secuencias se ofrecen en cada sesión de monitoreo.</div>
+        </div>
+      </div>
+      <div class="step st">
+        <div class="step-n">4</div>
+        <div>
+          <div class="step-hed">Exportar datos en cada visita de seguimiento</div>
+          <div class="step-txt">Desde Ajustes → "Exportar datos", se genera un ZIP con todos los CSV clínicos. La hoja de compartir de Android permite enviarlo por correo, Drive o WhatsApp al equipo investigador.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider dt"></div>
+
+    <p class="sec-eyebrow">Alertas biomecánicas</p>
+    <h2 class="sec-h">Qué registra la app durante el ejercicio</h2>
+    <p class="sec-p">La app emite alertas visuales en pantalla en tiempo real. Todas quedan registradas en el CSV clínico con timestamp, fase de la repetición y severidad.</p>
+
+    <div class="alarms">
+      <div class="alm alm-y">
+        <div class="alm-lbl">Amarilla — Corrección postural</div>
+        <div class="alm-txt">Compensación detectada. El ejercicio puede continuar. Ejemplos: rodilla flexionada en elevación de talón, descenso brusco en heel drop, inclinación de tronco en step-up.</div>
+      </div>
+      <div class="alm alm-r">
+        <div class="alm-lbl">Roja — Detener</div>
+        <div class="alm-txt">Riesgo biomecánico. La app indica detener el ejercicio. Se reserva para compensaciones severas implementadas según la indicación clínica de cada ejercicio.</div>
+      </div>
+    </div>
+
+    <div class="callout ct">
+      <strong>En el CSV:</strong> las columnas <code>alarma_activa</code> y <code>severidad_alarma</code> están presentes en todos los archivos. El total de alarmas amarillas acumuladas aparece también en el resumen de progreso del paciente dentro de la app.
+    </div>
+
+    <div class="divider dt"></div>
+
+    <p class="sec-eyebrow">Datos registrados</p>
+    <h2 class="sec-h">Qué captura la app por sesión</h2>
+
+    <div class="two">
+      <div class="card">
+        <div class="card-hed">Sesión de Tai Chi</div>
+        <div class="card-txt" style="font-size:14px">Fecha, duración total, tiempo en respiratorios y en ejercicios Tai Chi por separado, entorno visual elegido, lista de ejercicios completados, fase del programa, escala de satisfacción (1–5) y si la sesión se terminó o se interrumpió.</div>
+      </div>
+      <div class="card">
+        <div class="card-hed">Sesión de ejercicio funcional</div>
+        <div class="card-txt" style="font-size:14px">Un CSV por ejercicio por serie (~30 Hz): timestamp, reps acumuladas, fase de la repetición, coordenadas normalizadas de landmarks clave con likelihood, ángulos calculados, alarma activa y severidad.</div>
+      </div>
+    </div>
+
+    <div class="divider dt"></div>
+
+    <p class="sec-eyebrow">Comunicación con el paciente</p>
+    <h2 class="sec-h">Consulta y seguimiento remoto</h2>
+    <p class="sec-p">El botón de ayuda dentro de la app abre un chat de WhatsApp con un mensaje pre-compuesto que incluye el nombre y código del paciente. El sistema de citas envía notificaciones automáticas sin necesidad de contacto manual.</p>
+
+    <div class="callout ct">
+      <strong>Nota para visitas de exportación:</strong> la app no requiere conexión durante la consulta — los datos se exportan del almacenamiento local del teléfono. La carpeta de exportación se ubica en Descargas del dispositivo y puede compartirse por cualquier medio disponible.
+    </div>
+
+  </div><!-- /panel-t -->
+
+</div><!-- /content -->
+
+<!-- ── FOOTER ─────────────────────────────────────── -->
+<footer>
+  <div class="f-logo">RehabApp <span>· CREE DIF Toluca</span></div>
+  <div class="f-meta">Facultad de Ingeniería · UAEMéx<br>Programa de Rehabilitación de Osteoporosis</div>
+</footer>
+
+<script>
+let cur = null;
+
+function sel(p) {
+  if (cur === p) return;
+  cur = p;
+
+  document.querySelectorAll('.pcard').forEach(c => c.classList.remove('sel'));
+  document.querySelector('.p' + p).classList.add('sel');
+
+  const ns = document.getElementById('ns');
+  ns.classList.add('visible');
+  ns.querySelectorAll('.npill').forEach(n => n.classList.remove('ap','ai','at'));
+  ns.querySelector('.p' + p).classList.add('a' + p);
+
+  document.querySelectorAll('.panel').forEach(s => s.classList.remove('active'));
+  const panel = document.getElementById('panel-' + p);
+  panel.classList.add('active');
+
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+}
+
+document.querySelectorAll('.pcard').forEach(c => {
+  c.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); c.click(); }
+  });
+});
+</script>
